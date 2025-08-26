@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { workPermitApi } from '@/lib/supabase'
 import { FileText, Users, CheckCircle, XCircle, Clock, Plus } from 'lucide-react'
+import Image from 'next/image'
 
 export default function HomePage() {
   const [stats, setStats] = useState({
@@ -65,8 +66,7 @@ export default function HomePage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">หน้าแรก</h1>
-          <p className="text-gray-600 mt-2">ระบบจัดการใบอนุญาตทำงานอุตสาหกรรม</p>
+          <p className="text-3xl font-bold text-gray-900">Document Management</p>
         </div>
         <Link href="/permits/new" className="btn-primary inline-flex items-center">
           <Plus className="h-5 w-5 mr-2" />
