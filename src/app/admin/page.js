@@ -1,8 +1,9 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { workPermitApi } from '@/lib/supabase'
-import { ArrowLeft, CheckCircle, XCircle, Clock, Eye, Search, Filter } from 'lucide-react'
+import { ArrowLeft, CheckCircle, XCircle, Clock, Eye, Search, Filter, LogOut } from 'lucide-react'
 import Link from 'next/link'
+import AdminLogin from '@/components/AdminLogin'
 
 export default function AdminDashboard() {
   const [permits, setPermits] = useState([])
@@ -11,14 +12,59 @@ export default function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('pending')
   const [actionLoading, setActionLoading] = useState(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [authLoading, setAuthLoading] = useState(true)
 
   useEffect(() => {
-    loadPermits()
+    checkAuthentication()
   }, [])
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadPermits()
+    }
+  }, [isAuthenticated])
 
   useEffect(() => {
     filterPermits()
   }, [permits, searchTerm, statusFilter])
+
+  const checkAuthentication = () => {
+    try {
+      const adminAuth = localStorage.getItem('adminAuth')
+      const authTime = localStorage.getItem('adminAuthTime')
+      const currentTime = Date.now()
+      const authDuration = 4 * 60 * 60 * 1000 // 4 hours in milliseconds
+
+      if (adminAuth === 'true' && authTime && (currentTime - parseInt(authTime)) < authDuration) {
+        setIsAuthenticated(true)
+      } else {
+        // Clear expired authentication
+        localStorage.removeItem('adminAuth')
+        localStorage.removeItem('adminAuthTime')
+        setIsAuthenticated(false)
+      }
+    } catch (error) {
+      console.error('Auth check error:', error)
+      setIsAuthenticated(false)
+    } finally {
+      setAuthLoading(false)
+    }
+  }
+
+  const handleLogin = (success) => {
+    if (success) {
+      setIsAuthenticated(true)
+    }
+  }
+
+  const handleLogout = () => {
+    if (confirm('คุณต้องการออกจากระบบใช่หรือไม่?')) {
+      localStorage.removeItem('adminAuth')
+      localStorage.removeItem('adminAuthTime')
+      setIsAuthenticated(false)
+    }
+  }
 
   const loadPermits = async () => {
     try {
@@ -60,7 +106,10 @@ export default function AdminDashboard() {
     setActionLoading(permitId)
     try {
       const signature = prompt('กรุณาใส่ชื่อผู้อนุมัติ:')
-      if (!signature) return
+      if (!signature) {
+        setActionLoading(null)
+        return
+      }
 
       await workPermitApi.updateApprovalStatus(permitId, status, reason, signature)
       await loadPermits() // Reload data
@@ -102,6 +151,21 @@ export default function AdminDashboard() {
     }
   }
 
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    )
+  }
+
+  // Show login if not authenticated
+  if (!isAuthenticated) {
+    return <AdminLogin onLogin={handleLogin} />
+  }
+
+  // Show loading while loading data
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -125,6 +189,20 @@ export default function AdminDashboard() {
             <p className="text-gray-600">อนุมัติ/ไม่อนุมัติใบขออนุญาตทำงาน</p>
           </div>
         </div>
+        <button
+          onClick={handleLogout}
+          className="btn-secondary inline-flex items-center"
+        >
+          <LogOut className="h-4 w-4 mr-2" />
+          ออกจากระบบ
+        </button>
+      </div>
+
+      {/* Session Info */}
+      <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-6">
+        <p className="text-sm text-green-700">
+          ✅ เข้าสู่ระบบ Admin สำเร็จ - Session จะหมดอายุใน 4 ชั่วโมง
+        </p>
       </div>
 
       {/* Stats Cards */}

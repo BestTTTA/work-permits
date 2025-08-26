@@ -167,13 +167,13 @@ export default function HomePage() {
           </div>
         </Link>
 
-        <Link href="/permits" className="card hover:shadow-md transition-shadow">
+        {/* <Link href="/permits" className="card hover:shadow-md transition-shadow">
           <div className="card-body text-center py-8">
             <Users className="h-12 w-12 mx-auto text-success-600 mb-4" />
             <h3 className="text-lg font-medium text-gray-900">จัดการใบขอ</h3>
             <p className="text-gray-500 mt-2">ดูและจัดการใบขออนุญาตทั้งหมด</p>
           </div>
-        </Link>
+        </Link> */}
 
         <Link href="/admin" className="card hover:shadow-md transition-shadow">
           <div className="card-body text-center py-8">

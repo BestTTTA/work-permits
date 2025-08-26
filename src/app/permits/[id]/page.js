@@ -83,16 +83,16 @@ export default function PermitDetailPage() {
     )
   }
 
-//   if (!permit) {
-//     return (
-//       <div className="text-center py-12">
-//         <h2 className="text-xl font-medium text-gray-900">ไม่พบใบขออนุญาต</h2>
-//         <Link href="/permits" className="btn-primary mt-4">
-//           กลับไปหน้ารายการ
-//         </Link>
-//       </div>
-//     )
-//   }
+  if (!permit) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-xl font-medium text-gray-900">ไม่พบใบขออนุญาต</h2>
+        <Link href="/permits" className="btn-primary mt-4">
+          กลับไปหน้ารายการ
+        </Link>
+      </div>
+    )
+  }
 
   const workDetails = parseJSONField(permit.work_details)
   const specialWorkType = parseJSONField(permit.special_work_type)
@@ -117,13 +117,13 @@ export default function PermitDetailPage() {
         </div>
         <div className="text-right">
           {getStatusBadge(permit.approval_status)}
-          {/* {permit.approval_status === 'pending' && (
+          {permit.approval_status === 'pending' && (
             <div className="mt-2">
               <Link href={`/admin/permits/${permit.id}`} className="btn-primary text-sm">
                 จัดการใบขอนี้
               </Link>
             </div>
-          )} */}
+          )}
         </div>
       </div>
 
